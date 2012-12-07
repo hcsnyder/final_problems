@@ -57,19 +57,34 @@ int main() {
     while(pos1 >= 0) {
       if(temp1 == curr1) {
         tweetsort.push_back(temp1);
-        tweetList.erase(tweetList.rbegin()+place);
       }
       place++;
       pos1--;
       temp1 = tweetList[pos1];
     }
+    curr1 = tweetList.back();
+    for(int t=0; t<tweetsort.size(); t++) {
+      string check = tweetsort[t];
+      if(check == curr1) {
+        tweetList.pop_back();
+        curr1 = tweetList.back();
+      }
+    }
   }
-  string curr = tweetList[0];
-  string temp = tweetList[1];
+  string curr = tweetsort[0];
+  string temp = tweetsort[1];
   int count = 1;
   int wordCount = 0;
   while(wordCount <= tweetsort.size()) {
-    int pos = 1;
+    int pos = 0;
+    for(int y=0; y<tweetList.size(); y++) {
+      string check = tweetList[y];
+      while(check == curr) {
+        curr = temp;
+        tweetsort.pop_back();
+        temp = tweetsort.back();
+      }
+    }
     if(temp == curr) {
       wordCount++;
       if(wordCount > count) {
@@ -88,7 +103,9 @@ int main() {
     }
     else {
       if(wordCount == count) {
-        sortedList[curr] = wordCount;
+        for(int d=0; d<count; d++) {
+          tweetList.push_back(curr);
+        }
       }
         curr = temp;
         pos++;
@@ -98,9 +115,33 @@ int main() {
     }
     ofs.open("sortedTweets.txt");
     ofs << "Word       # of appearance \n";
-    map<string, int>::reverse_iterator rit;
-    for(rit=sortedList.rbegin(); rit!=sortedList.rend(); rit++) {
-      ofs << rit->first << "  " << rit->second << endl;
+    unsigned int place = tweetList.size()-1;
+    curr = tweetList[place];
+    temp = tweetList[place-1];
+    wordCount = 1;
+    while(place != 1) {
+      if(curr == temp) {
+        wordCount ++;
+      }
+      else {
+        ofs << curr << "  " << wordCount << endl;
+        curr = temp;
+        place--;
+        temp = tweetList[place-1];
+        wordCount = 1;
+      }
+    }
+    if(place == 1) {
+      temp = tweetList.front();
+      if(temp == curr) {
+        wordCount++;
+      }
+      else {
+        ofs << curr << "  " << wordCount << endl;
+        wordCount = 1;
+        
+      }
+      ofs << temp << "  " << wordCount << endl;
     }
   ofs.close();
 }
