@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <map>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -12,15 +13,14 @@ int main() {
   
   string tweet;
   
-  map<string, int> tweetMap;
- 
-  map<string, int> sortedMap;
+  vector<string> tweetList;
+  map<string, int> sortedList;
   getline(ifs, tweet);
   while(!tweet.empty()) {  
     int space = 0; 
     int spaceLast = 0;
     int wordSpace;
-    String word;
+    string word;
     for(int i=0; i<tweet.size(); i++) {
 
  
@@ -41,35 +41,66 @@ int main() {
           wordSpace = space-spaceLast;
           word = tweet.substr(spaceLast+1, wordSpace);
         }
-        if(tweepMap[word] > 0) {
-          tweetMap[word]++;
-        }
-        else {
-          tweetMap[word]=1;
-        }
+        tweetList.push_back(word);
       }
     }
     getline(ifs, tweet);    
   } 
-
-  map<string, int>::reverse_iterator rit;
-  it=mymap.begin();
+  vector<string> tweetsort;
+  string curr1 = tweetList.back();
+  while(tweetList.empty() != true) {
+    tweetList.pop_back();
+    int place = 0;
+    tweetsort.push_back(curr1);
+    unsigned int pos1 = tweetList.size()-2;
+    string temp1 = tweetList[pos1];
+    while(pos1 >= 0) {
+      if(temp1 == curr1) {
+        tweetsort.push_back(temp1);
+        tweetList.erase(tweetList.rbegin()+place);
+      }
+      place++;
+      pos1--;
+      temp1 = tweetList[pos1];
+    }
+  }
+  string curr = tweetList[0];
+  string temp = tweetList[1];
   int count = 1;
-  while(tweetMap.size() != 0) {
-    for(rit=tweetMap.rbegin(); rit != tweetMap.rend(); rit++) {
-      if(rit->second == count) {
-        string index = rit->first;
-        sortedMap.[index]=(rit->second);
-        map<string, int>::reverse_iterator eraseRit = rit;
-        tweetMap.erase(eraseRit);
+  int wordCount = 0;
+  while(wordCount <= tweetsort.size()) {
+    int pos = 1;
+    if(temp == curr) {
+      wordCount++;
+      if(wordCount > count) {
+        while(temp == curr) {
+          pos++;
+          curr = temp;
+          temp = tweetList[pos];
+        }
+        wordCount = 1;
+      }
+      else {
+        pos++;
+        curr = temp;
+        temp = tweetList[pos];
       }
     }
-    count++;
-  }
-  ofs.open("sortedTweets.txt");
-  ofs << "Word       # of appearance \n";
-  for(rit=sortedMap.rbegin(); rit != sortedMap.rend(); rit++) {
-    ofs << rit->first << "  " << rit->second << endl;
-  }
+    else {
+      if(wordCount == count) {
+        sortedList[curr] = wordCount;
+      }
+        curr = temp;
+        pos++;
+        temp = tweetList[pos];
+        wordCount == 0;
+      }
+    }
+    ofs.open("sortedTweets.txt");
+    ofs << "Word       # of appearance \n";
+    map<string, int>::reverse_iterator rit;
+    for(rit=sortedList.rbegin(); rit!=sortedList.rend(); rit++) {
+      ofs << rit->first << "  " << rit->second << endl;
+    }
   ofs.close();
 }
